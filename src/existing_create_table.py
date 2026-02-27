@@ -11,16 +11,26 @@ def create_existing_table():
         + ".csv")
     
     print(f"指定されたCSVファイル: {csv_name}")
-    if Path(csv_name).is_file():
-        with open(csv_name, "r", encoding="shift-jis") as f:
+
+    if not Path(csv_name).is_file():
+        print(f"指定されたディレクトリが見つかりませんでした: {csv_name}")
+        sys.exit(1)
+
+    try:
+       with open(csv_name, "r", encoding="shift-jis") as f:
             reader = csv.reader(f)
             table = []
             for i in reader:
                 table.append(list(i[0].split("\t")))
-        return table
-    else:
-        print("指定されたCSVファイルが見つかりませんでした。")
-        sys.exit(1)
+    
+    except UnicodeDecodeError:
+        with open(csv_name, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            table = []
+            for i in reader:
+                table.append(list(i[0].split("\t")))
+
+    return table
 
 if __name__ == "__main__":
     table = create_existing_table()
